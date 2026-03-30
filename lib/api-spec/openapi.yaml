@@ -1,22 +1,36 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: VidyaShala API specification - India's AI-powered multilingual learning platform
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: videos
+    description: Video operations
+  - name: shorts
+    description: Shorts/Reels operations
+  - name: creators
+    description: Creator channel operations
+  - name: sectors
+    description: Knowledge sector operations
+  - name: quizzes
+    description: Quiz and learning operations
+  - name: users
+    description: User profile and dashboard operations
+  - name: community
+    description: Community and discussion operations
+  - name: ai
+    description: AI tutor operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +38,706 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /videos:
+    get:
+      operationId: listVideos
+      tags: [videos]
+      summary: List all videos with optional filters
+      parameters:
+        - name: sector
+          in: query
+          schema:
+            type: string
+        - name: language
+          in: query
+          schema:
+            type: string
+        - name: trending
+          in: query
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of videos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Video"
+    post:
+      operationId: createVideo
+      tags: [videos]
+      summary: Upload a new video lesson
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateVideoBody"
+      responses:
+        "201":
+          description: Created video
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Video"
+
+  /videos/{id}:
+    get:
+      operationId: getVideo
+      tags: [videos]
+      summary: Get a specific video
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Video details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Video"
+        "404":
+          description: Not found
+
+  /videos/{id}/like:
+    post:
+      operationId: likeVideo
+      tags: [videos]
+      summary: Like or unlike a video
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Updated like count
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LikeResponse"
+
+  /videos/trending:
+    get:
+      operationId: getTrendingVideos
+      tags: [videos]
+      summary: Get trending videos across sectors
+      responses:
+        "200":
+          description: Trending videos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Video"
+
+  /videos/recommended:
+    get:
+      operationId: getRecommendedVideos
+      tags: [videos]
+      summary: Get personalized recommended videos
+      responses:
+        "200":
+          description: Recommended videos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Video"
+
+  /shorts:
+    get:
+      operationId: listShorts
+      tags: [shorts]
+      summary: List all shorts/reels
+      parameters:
+        - name: sector
+          in: query
+          schema:
+            type: string
+        - name: language
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of shorts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Short"
+    post:
+      operationId: createShort
+      tags: [shorts]
+      summary: Upload a new short/reel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateShortBody"
+      responses:
+        "201":
+          description: Created short
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Short"
+
+  /shorts/{id}:
+    get:
+      operationId: getShort
+      tags: [shorts]
+      summary: Get a specific short
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Short details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Short"
+
+  /creators:
+    get:
+      operationId: listCreators
+      tags: [creators]
+      summary: List all creators
+      parameters:
+        - name: sector
+          in: query
+          schema:
+            type: string
+        - name: verified
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of creators
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Creator"
+    post:
+      operationId: createCreator
+      tags: [creators]
+      summary: Create a creator channel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCreatorBody"
+      responses:
+        "201":
+          description: Created creator
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Creator"
+
+  /creators/{id}:
+    get:
+      operationId: getCreator
+      tags: [creators]
+      summary: Get a creator's channel
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Creator channel details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Creator"
+
+  /creators/{id}/analytics:
+    get:
+      operationId: getCreatorAnalytics
+      tags: [creators]
+      summary: Get creator analytics dashboard data
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Analytics data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatorAnalytics"
+
+  /creators/spotlight:
+    get:
+      operationId: getCreatorSpotlight
+      tags: [creators]
+      summary: Get featured/spotlight creators
+      responses:
+        "200":
+          description: Spotlight creators
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Creator"
+
+  /sectors:
+    get:
+      operationId: listSectors
+      tags: [sectors]
+      summary: List all knowledge sectors
+      responses:
+        "200":
+          description: List of sectors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Sector"
+
+  /sectors/{slug}:
+    get:
+      operationId: getSector
+      tags: [sectors]
+      summary: Get a specific sector hub
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Sector details with videos, creators, quizzes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SectorDetail"
+
+  /sectors/stats:
+    get:
+      operationId: getSectorStats
+      tags: [sectors]
+      summary: Get stats for all sectors
+      responses:
+        "200":
+          description: Sector stats
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SectorStat"
+
+  /quizzes:
+    get:
+      operationId: listQuizzes
+      tags: [quizzes]
+      summary: List quizzes
+      parameters:
+        - name: sector
+          in: query
+          schema:
+            type: string
+        - name: videoId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of quizzes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Quiz"
+    post:
+      operationId: createQuiz
+      tags: [quizzes]
+      summary: Create a new quiz
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateQuizBody"
+      responses:
+        "201":
+          description: Created quiz
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quiz"
+
+  /quizzes/{id}:
+    get:
+      operationId: getQuiz
+      tags: [quizzes]
+      summary: Get a specific quiz with questions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Quiz with questions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quiz"
+
+  /quizzes/{id}/submit:
+    post:
+      operationId: submitQuizAttempt
+      tags: [quizzes]
+      summary: Submit quiz answers and get score
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuizSubmitBody"
+      responses:
+        "200":
+          description: Quiz result with score and analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuizResult"
+
+  /leaderboard:
+    get:
+      operationId: getLeaderboard
+      tags: [quizzes]
+      summary: Get quiz leaderboard
+      responses:
+        "200":
+          description: Leaderboard entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LeaderboardEntry"
+
+  /users/profile:
+    get:
+      operationId: getUserProfile
+      tags: [users]
+      summary: Get the current user's profile
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+    patch:
+      operationId: updateUserProfile
+      tags: [users]
+      summary: Update user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileBody"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
+  /users/dashboard:
+    get:
+      operationId: getUserDashboard
+      tags: [users]
+      summary: Get user learning dashboard summary
+      responses:
+        "200":
+          description: Dashboard data with progress, streaks, recommendations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDashboard"
+
+  /users/history:
+    get:
+      operationId: getWatchHistory
+      tags: [users]
+      summary: Get user's watch history
+      responses:
+        "200":
+          description: Watch history entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WatchHistoryEntry"
+
+  /users/saved:
+    get:
+      operationId: getSavedVideos
+      tags: [users]
+      summary: Get user's saved videos
+      responses:
+        "200":
+          description: Saved videos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Video"
+
+  /users/saved/{videoId}:
+    post:
+      operationId: saveVideo
+      tags: [users]
+      summary: Save or unsave a video
+      parameters:
+        - name: videoId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Save status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SaveResponse"
+
+  /community/posts:
+    get:
+      operationId: listCommunityPosts
+      tags: [community]
+      summary: List community discussion posts
+      parameters:
+        - name: sector
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Community posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommunityPost"
+    post:
+      operationId: createCommunityPost
+      tags: [community]
+      summary: Create a community post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePostBody"
+      responses:
+        "201":
+          description: Created post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommunityPost"
+
+  /community/posts/{id}/comments:
+    get:
+      operationId: getPostComments
+      tags: [community]
+      summary: Get comments for a post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Comment"
+    post:
+      operationId: addComment
+      tags: [community]
+      summary: Add a comment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCommentBody"
+      responses:
+        "201":
+          description: Created comment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+
+  /ai/ask:
+    post:
+      operationId: askAI
+      tags: [ai]
+      summary: Ask the AI tutor a question
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AskAIBody"
+      responses:
+        "200":
+          description: AI tutor response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AIResponse"
+
+  /ai/generate-quiz:
+    post:
+      operationId: generateAIQuiz
+      tags: [ai]
+      summary: Generate a quiz using AI for a given topic
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateQuizBody"
+      responses:
+        "200":
+          description: Generated quiz questions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeneratedQuiz"
+
+  /ai/flashcards:
+    post:
+      operationId: generateFlashcards
+      tags: [ai]
+      summary: Generate flashcards for a topic
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FlashcardsBody"
+      responses:
+        "200":
+          description: Generated flashcards
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Flashcard"
+
+  /ai/study-plan:
+    post:
+      operationId: generateStudyPlan
+      tags: [ai]
+      summary: Generate a personalized study plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudyPlanBody"
+      responses:
+        "200":
+          description: Study plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudyPlan"
+
+  /home/feed:
+    get:
+      operationId: getHomeFeed
+      tags: [videos]
+      summary: Get the home page feed with all sections
+      responses:
+        "200":
+          description: Home feed data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HomeFeed"
+
+  /platform/stats:
+    get:
+      operationId: getPlatformStats
+      tags: [videos]
+      summary: Get overall platform statistics
+      responses:
+        "200":
+          description: Platform stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformStats"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +748,1024 @@ components:
       required:
         - status
 
+    Video:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        thumbnailUrl:
+          type: string
+        videoUrl:
+          type: string
+        duration:
+          type: string
+        views:
+          type: integer
+        likes:
+          type: integer
+        sector:
+          type: string
+        language:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        creatorId:
+          type: integer
+        creatorName:
+          type: string
+        creatorAvatar:
+          type: string
+        isVerified:
+          type: boolean
+        hasQuiz:
+          type: boolean
+        hasNotes:
+          type: boolean
+        hasFlashcards:
+          type: boolean
+        chapterCount:
+          type: integer
+        difficulty:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - title
+        - thumbnailUrl
+        - duration
+        - views
+        - likes
+        - sector
+        - language
+        - creatorId
+        - creatorName
+        - creatorAvatar
+        - isVerified
+        - hasQuiz
+        - hasNotes
+        - hasFlashcards
+        - chapterCount
+        - difficulty
+        - createdAt
+
+    CreateVideoBody:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        thumbnailUrl:
+          type: string
+        videoUrl:
+          type: string
+        duration:
+          type: string
+        sector:
+          type: string
+        language:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        difficulty:
+          type: string
+        creatorId:
+          type: integer
+      required:
+        - title
+        - sector
+        - language
+        - difficulty
+        - creatorId
+
+    Short:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        videoUrl:
+          type: string
+        thumbnailUrl:
+          type: string
+        duration:
+          type: string
+        views:
+          type: integer
+        likes:
+          type: integer
+        sector:
+          type: string
+        language:
+          type: string
+        creatorId:
+          type: integer
+        creatorName:
+          type: string
+        creatorAvatar:
+          type: string
+        isVerified:
+          type: boolean
+        hasQuickQuiz:
+          type: boolean
+        createdAt:
+          type: string
+      required:
+        - id
+        - title
+        - videoUrl
+        - thumbnailUrl
+        - duration
+        - views
+        - likes
+        - sector
+        - language
+        - creatorId
+        - creatorName
+        - creatorAvatar
+        - isVerified
+        - hasQuickQuiz
+        - createdAt
+
+    CreateShortBody:
+      type: object
+      properties:
+        title:
+          type: string
+        videoUrl:
+          type: string
+        thumbnailUrl:
+          type: string
+        sector:
+          type: string
+        language:
+          type: string
+        creatorId:
+          type: integer
+      required:
+        - title
+        - sector
+        - language
+        - creatorId
+
+    Creator:
+      type: object
+      properties:
+        id:
+          type: integer
+        channelName:
+          type: string
+        bio:
+          type: string
+        avatarUrl:
+          type: string
+        bannerUrl:
+          type: string
+        sector:
+          type: string
+        isVerified:
+          type: boolean
+        followers:
+          type: integer
+        totalViews:
+          type: integer
+        videoCount:
+          type: integer
+        shortCount:
+          type: integer
+        languages:
+          type: array
+          items:
+            type: string
+        joinedAt:
+          type: string
+        monthlyEarnings:
+          type: number
+      required:
+        - id
+        - channelName
+        - avatarUrl
+        - sector
+        - isVerified
+        - followers
+        - totalViews
+        - videoCount
+        - shortCount
+        - languages
+        - joinedAt
+        - monthlyEarnings
+
+    CreateCreatorBody:
+      type: object
+      properties:
+        channelName:
+          type: string
+        bio:
+          type: string
+        sector:
+          type: string
+        languages:
+          type: array
+          items:
+            type: string
+      required:
+        - channelName
+        - sector
+        - languages
+
+    CreatorAnalytics:
+      type: object
+      properties:
+        creatorId:
+          type: integer
+        totalViews:
+          type: integer
+        totalLikes:
+          type: integer
+        totalSubscribers:
+          type: integer
+        monthlyEarnings:
+          type: number
+        viewsByMonth:
+          type: array
+          items:
+            $ref: "#/components/schemas/MonthlyData"
+        earningsByMonth:
+          type: array
+          items:
+            $ref: "#/components/schemas/MonthlyData"
+        topVideos:
+          type: array
+          items:
+            $ref: "#/components/schemas/Video"
+        engagementRate:
+          type: number
+      required:
+        - creatorId
+        - totalViews
+        - totalLikes
+        - totalSubscribers
+        - monthlyEarnings
+        - viewsByMonth
+        - earningsByMonth
+        - topVideos
+        - engagementRate
+
+    MonthlyData:
+      type: object
+      properties:
+        month:
+          type: string
+        value:
+          type: number
+      required:
+        - month
+        - value
+
+    Sector:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        iconName:
+          type: string
+        color:
+          type: string
+        videoCount:
+          type: integer
+        creatorCount:
+          type: integer
+        learnerCount:
+          type: integer
+      required:
+        - id
+        - name
+        - slug
+        - description
+        - iconName
+        - color
+        - videoCount
+        - creatorCount
+        - learnerCount
+
+    SectorDetail:
+      type: object
+      properties:
+        sector:
+          $ref: "#/components/schemas/Sector"
+        featuredCreators:
+          type: array
+          items:
+            $ref: "#/components/schemas/Creator"
+        trendingVideos:
+          type: array
+          items:
+            $ref: "#/components/schemas/Video"
+        trendingShorts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Short"
+        beginnerRoadmap:
+          type: array
+          items:
+            $ref: "#/components/schemas/RoadmapItem"
+        advancedRoadmap:
+          type: array
+          items:
+            $ref: "#/components/schemas/RoadmapItem"
+        quizzes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Quiz"
+      required:
+        - sector
+        - featuredCreators
+        - trendingVideos
+        - trendingShorts
+        - beginnerRoadmap
+        - advancedRoadmap
+        - quizzes
+
+    RoadmapItem:
+      type: object
+      properties:
+        order:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        duration:
+          type: string
+        isCompleted:
+          type: boolean
+      required:
+        - order
+        - title
+        - description
+        - duration
+        - isCompleted
+
+    SectorStat:
+      type: object
+      properties:
+        sectorSlug:
+          type: string
+        sectorName:
+          type: string
+        videoCount:
+          type: integer
+        learnerCount:
+          type: integer
+        growthPercent:
+          type: number
+      required:
+        - sectorSlug
+        - sectorName
+        - videoCount
+        - learnerCount
+        - growthPercent
+
+    Quiz:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        sector:
+          type: string
+        difficulty:
+          type: string
+        questionCount:
+          type: integer
+        timeLimit:
+          type: integer
+        passingScore:
+          type: integer
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuizQuestion"
+        videoId:
+          type: ["integer", "null"]
+        creatorId:
+          type: integer
+        attempts:
+          type: integer
+        averageScore:
+          type: number
+      required:
+        - id
+        - title
+        - sector
+        - difficulty
+        - questionCount
+        - timeLimit
+        - passingScore
+        - questions
+        - creatorId
+        - attempts
+        - averageScore
+
+    QuizQuestion:
+      type: object
+      properties:
+        id:
+          type: integer
+        question:
+          type: string
+        options:
+          type: array
+          items:
+            type: string
+        correctIndex:
+          type: integer
+        explanation:
+          type: string
+      required:
+        - id
+        - question
+        - options
+        - correctIndex
+        - explanation
+
+    CreateQuizBody:
+      type: object
+      properties:
+        title:
+          type: string
+        sector:
+          type: string
+        difficulty:
+          type: string
+        timeLimit:
+          type: integer
+        passingScore:
+          type: integer
+        videoId:
+          type: ["integer", "null"]
+        creatorId:
+          type: integer
+      required:
+        - title
+        - sector
+        - difficulty
+        - timeLimit
+        - passingScore
+        - creatorId
+
+    QuizSubmitBody:
+      type: object
+      properties:
+        answers:
+          type: array
+          items:
+            type: integer
+        timeTaken:
+          type: integer
+      required:
+        - answers
+        - timeTaken
+
+    QuizResult:
+      type: object
+      properties:
+        quizId:
+          type: integer
+        score:
+          type: integer
+        totalQuestions:
+          type: integer
+        correctAnswers:
+          type: integer
+        passed:
+          type: boolean
+        timeTaken:
+          type: integer
+        badge:
+          type: ["string", "null"]
+        weakTopics:
+          type: array
+          items:
+            type: string
+        nextSuggestions:
+          type: array
+          items:
+            type: string
+      required:
+        - quizId
+        - score
+        - totalQuestions
+        - correctAnswers
+        - passed
+        - timeTaken
+        - weakTopics
+        - nextSuggestions
+
+    LeaderboardEntry:
+      type: object
+      properties:
+        rank:
+          type: integer
+        userName:
+          type: string
+        avatarUrl:
+          type: string
+        score:
+          type: integer
+        quizzesTaken:
+          type: integer
+        streak:
+          type: integer
+        badge:
+          type: string
+      required:
+        - rank
+        - userName
+        - avatarUrl
+        - score
+        - quizzesTaken
+        - streak
+        - badge
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        avatarUrl:
+          type: string
+        preferredLanguage:
+          type: string
+        sectors:
+          type: array
+          items:
+            type: string
+        streak:
+          type: integer
+        totalXP:
+          type: integer
+        badges:
+          type: array
+          items:
+            type: string
+        joinedAt:
+          type: string
+        isCreator:
+          type: boolean
+        creatorId:
+          type: ["integer", "null"]
+      required:
+        - id
+        - name
+        - email
+        - avatarUrl
+        - preferredLanguage
+        - sectors
+        - streak
+        - totalXP
+        - badges
+        - joinedAt
+        - isCreator
+
+    UpdateProfileBody:
+      type: object
+      properties:
+        name:
+          type: string
+        preferredLanguage:
+          type: string
+        sectors:
+          type: array
+          items:
+            type: string
+
+    UserDashboard:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/UserProfile"
+        continueWatching:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContinueWatchingItem"
+        weeklyStreak:
+          type: array
+          items:
+            type: boolean
+        xpProgress:
+          type: integer
+        xpToNextLevel:
+          type: integer
+        currentLevel:
+          type: string
+        quizzesTaken:
+          type: integer
+        videosWatched:
+          type: integer
+        minutesLearned:
+          type: integer
+        recentBadges:
+          type: array
+          items:
+            type: string
+      required:
+        - user
+        - continueWatching
+        - weeklyStreak
+        - xpProgress
+        - xpToNextLevel
+        - currentLevel
+        - quizzesTaken
+        - videosWatched
+        - minutesLearned
+        - recentBadges
+
+    ContinueWatchingItem:
+      type: object
+      properties:
+        video:
+          $ref: "#/components/schemas/Video"
+        progressPercent:
+          type: integer
+        lastWatchedAt:
+          type: string
+      required:
+        - video
+        - progressPercent
+        - lastWatchedAt
+
+    WatchHistoryEntry:
+      type: object
+      properties:
+        video:
+          $ref: "#/components/schemas/Video"
+        watchedAt:
+          type: string
+        progressPercent:
+          type: integer
+      required:
+        - video
+        - watchedAt
+        - progressPercent
+
+    LikeResponse:
+      type: object
+      properties:
+        likes:
+          type: integer
+        liked:
+          type: boolean
+      required:
+        - likes
+        - liked
+
+    SaveResponse:
+      type: object
+      properties:
+        saved:
+          type: boolean
+      required:
+        - saved
+
+    CommunityPost:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        content:
+          type: string
+        sector:
+          type: string
+        authorName:
+          type: string
+        authorAvatar:
+          type: string
+        likes:
+          type: integer
+        commentCount:
+          type: integer
+        tags:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - title
+        - content
+        - sector
+        - authorName
+        - authorAvatar
+        - likes
+        - commentCount
+        - tags
+        - createdAt
+
+    CreatePostBody:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        sector:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+      required:
+        - title
+        - content
+        - sector
+
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+        content:
+          type: string
+        authorName:
+          type: string
+        authorAvatar:
+          type: string
+        likes:
+          type: integer
+        createdAt:
+          type: string
+      required:
+        - id
+        - content
+        - authorName
+        - authorAvatar
+        - likes
+        - createdAt
+
+    CreateCommentBody:
+      type: object
+      properties:
+        content:
+          type: string
+      required:
+        - content
+
+    AskAIBody:
+      type: object
+      properties:
+        question:
+          type: string
+        language:
+          type: string
+        context:
+          type: string
+        mode:
+          type: string
+      required:
+        - question
+        - language
+
+    AIResponse:
+      type: object
+      properties:
+        answer:
+          type: string
+        language:
+          type: string
+        suggestions:
+          type: array
+          items:
+            type: string
+        relatedTopics:
+          type: array
+          items:
+            type: string
+        mode:
+          type: string
+      required:
+        - answer
+        - language
+        - suggestions
+        - relatedTopics
+        - mode
+
+    GenerateQuizBody:
+      type: object
+      properties:
+        topic:
+          type: string
+        sector:
+          type: string
+        difficulty:
+          type: string
+        questionCount:
+          type: integer
+        language:
+          type: string
+      required:
+        - topic
+        - sector
+        - difficulty
+        - questionCount
+        - language
+
+    GeneratedQuiz:
+      type: object
+      properties:
+        topic:
+          type: string
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuizQuestion"
+      required:
+        - topic
+        - questions
+
+    FlashcardsBody:
+      type: object
+      properties:
+        topic:
+          type: string
+        language:
+          type: string
+        count:
+          type: integer
+      required:
+        - topic
+        - language
+        - count
+
+    Flashcard:
+      type: object
+      properties:
+        front:
+          type: string
+        back:
+          type: string
+        topic:
+          type: string
+      required:
+        - front
+        - back
+        - topic
+
+    StudyPlanBody:
+      type: object
+      properties:
+        goal:
+          type: string
+        sector:
+          type: string
+        hoursPerDay:
+          type: integer
+        durationWeeks:
+          type: integer
+        language:
+          type: string
+      required:
+        - goal
+        - sector
+        - hoursPerDay
+        - durationWeeks
+        - language
+
+    StudyPlan:
+      type: object
+      properties:
+        goal:
+          type: string
+        weeks:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudyWeek"
+        totalHours:
+          type: integer
+        milestones:
+          type: array
+          items:
+            type: string
+      required:
+        - goal
+        - weeks
+        - totalHours
+        - milestones
+
+    StudyWeek:
+      type: object
+      properties:
+        week:
+          type: integer
+        theme:
+          type: string
+        topics:
+          type: array
+          items:
+            type: string
+        hoursRequired:
+          type: integer
+      required:
+        - week
+        - theme
+        - topics
+        - hoursRequired
+
+    HomeFeed:
+      type: object
+      properties:
+        trendingVideos:
+          type: array
+          items:
+            $ref: "#/components/schemas/Video"
+        recommendedVideos:
+          type: array
+          items:
+            $ref: "#/components/schemas/Video"
+        trendingShorts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Short"
+        sectors:
+          type: array
+          items:
+            $ref: "#/components/schemas/Sector"
+        spotlightCreators:
+          type: array
+          items:
+            $ref: "#/components/schemas/Creator"
+        careerUpdates:
+          type: array
+          items:
+            $ref: "#/components/schemas/Video"
+        technologyVideos:
+          type: array
+          items:
+            $ref: "#/components/schemas/Video"
+        agricultureVideos:
+          type: array
+          items:
+            $ref: "#/components/schemas/Video"
+        financeVideos:
+          type: array
+          items:
+            $ref: "#/components/schemas/Video"
+      required:
+        - trendingVideos
+        - recommendedVideos
+        - trendingShorts
+        - sectors
+        - spotlightCreators
+        - careerUpdates
+        - technologyVideos
+        - agricultureVideos
+        - financeVideos
+
+    PlatformStats:
+      type: object
+      properties:
+        totalVideos:
+          type: integer
+        totalCreators:
+          type: integer
+        totalLearners:
+          type: integer
+        totalShorts:
+          type: integer
+        languagesSupported:
+          type: integer
+        sectorsCount:
+          type: integer
+      required:
+        - totalVideos
+        - totalCreators
+        - totalLearners
+        - totalShorts
+        - languagesSupported
+        - sectorsCount
