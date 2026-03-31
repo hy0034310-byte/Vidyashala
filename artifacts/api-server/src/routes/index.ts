@@ -1,26 +1,19 @@
-import { Router, type IRouter } from "express";
-import healthRouter from "./health";
-import videosRouter from "./videos";
-import shortsRouter from "./shorts";
-import creatorsRouter from "./creators";
-import sectorsRouter from "./sectors";
-import quizzesRouter from "./quizzes";
-import usersRouter from "./users";
-import communityRouter from "./community";
-import aiRouter from "./ai";
-import homeRouter from "./home";
+import express from "express";
+import cors from "cors";
+import videoRoutes from "./routes/videos";
 
-const router: IRouter = Router();
+const app = express();
 
-router.use(healthRouter);
-router.use(videosRouter);
-router.use(shortsRouter);
-router.use(creatorsRouter);
-router.use(sectorsRouter);
-router.use(quizzesRouter);
-router.use(usersRouter);
-router.use(communityRouter);
-router.use(aiRouter);
-router.use(homeRouter);
+app.use(cors());
+app.use(express.json());
 
-export default router;
+app.use("/api/videos", videoRoutes);
+
+app.get("/", (_req, res) => {
+  res.json({
+    success: true,
+    message: "Vidyashala API running 🚀",
+  });
+});
+
+export default app;
